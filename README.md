@@ -87,15 +87,12 @@ WOS:000179648100005|Nagoya University->National Institutes of Natural Sciences (
 WOS:000179648100005|Nagoya University->University of Tokyo|
 WOS:000179648100005|National Astronomical Observatory of Japan->National Institutes of Natural Sciences (NINS) - Japan|
 
-
-
-
 ## create final edgelist of organizations for network analysis
 Now that we have the pairs, we can group by them in order to remove any duplicate relationship per pair.
 Now with uniques pairs per documnet, we can count the number of documents each pair shares (this will become the edge weight).
 ```
 CREATE MATERIALIZED VIEW edgelist_orgs_network AS
-SELECT ar.weight, nodes[1] as "from", nodes[2]  as "to"
+SELECT nodes[1] as "from", nodes[2]  as "to", ar.weight
 FROM (
     SELECT
         m.weight,
@@ -111,22 +108,91 @@ FROM (
 ) ar
 ;
 ```
-weight|from|to|
+|from|to|weight|
 | --|  -------------   |  --------------------------------------    |
-135|National Astronomical Observatory of Japan|National Institutes of Natural Sciences (NINS) - Japan|
-107|NASA Goddard Space Flight Center|National Aeronautics & Space Administration (NASA)|
-104|National Institutes of Natural Sciences (NINS) - Japan|University of Tokyo|
-98|California Institute of Technology|National Aeronautics & Space Administration (NASA)|
-93|Nagoya University|National Institutes of Natural Sciences (NINS) - Japan|
-91|Harvard University|Smithsonian Institution|
-84|California Institute of Technology|Max Planck Society|
-83|Korea Astronomy & Space Science Institute (KASI)|Max Planck Society|
-82|Keele University|University of St Andrews|
-81|Nagoya University|National Astronomical Observatory of Japan|
-78|Korea Astronomy & Space Science Institute (KASI)|Ohio State University|
-77|National Astronomical Observatory of Japan|University of Tokyo|
-76|Max Planck Society|Ohio State University|
-76|Max Planck Society|Smithsonian Institution|
-74|Max Planck Society|National Aeronautics & Space Administration (NASA)|
+National Astronomical Observatory of Japan|National Institutes of Natural Sciences (NINS) - Japan|135|
+NASA Goddard Space Flight Center|National Aeronautics & Space Administration (NASA)|107|
+National Institutes of Natural Sciences (NINS) - Japan|University of Tokyo|104|
+California Institute of Technology|National Aeronautics & Space Administration (NASA)|98|
+Nagoya University|National Institutes of Natural Sciences (NINS) - Japan|93|
+Harvard University|Smithsonian Institution|91|
+California Institute of Technology|Max Planck Society|84|
+Korea Astronomy & Space Science Institute (KASI)|Max Planck Society|83|
+Keele University|University of St Andrews|82|
+Nagoya University|National Astronomical Observatory of Japan|81|
+Korea Astronomy & Space Science Institute (KASI)|Ohio State University|78|
+National Astronomical Observatory of Japan|University of Tokyo|77|
+Max Planck Society|Ohio State University|76|
+Max Planck Society|Smithsonian Institution|76|
+Max Planck Society|National Aeronautics & Space Administration (NASA)|74|
 
+## Visualize the network
+
+### R plots using GGally
+```
+library(RPostgres) # To interact with postgresql
+library(readxl)
+library(GGally) #ggnet2 is available through the GGally package
+
+# Script settings for postgresql
+my_credentials <- readxl::read_xlsx("C:/Users/folder/my_credentials.xlsx")
+port = 1234
+my_dbname = my_credentials$dbname[c(1)]
+my_host = my_credentials$host[c(1)] 
+my_user = my_credentials$user[c(1)] 
+my_password = my_credentials$password[c(1)]
+
+#first establish connection to database
+drv <- RPostgres::Postgres()
+print("Connecting to Database…")
+connec <- dbConnect(drv, 
+                    dbname = my_dbname,
+                    host = my_host, 
+                    port = my_port,
+                    user = my_user, 
+                    password = my_password)
+print("Database Connected!")
+
+# Fetch required data
+table1 = 'edgelist_orgs_network'
+schema1 = 'my_schema'
+query1 <- dbSendQuery(connec, glue('select * from "{schema1}"."{table1}";'))
+network_table <- dbFetch(query1)
+
+table2 = 'orgs_rankings'
+schema2 = 'my_other_schema'
+query2 <- dbSendQuery(connec, glue('select * from "{schema2}"."{table2}";'))
+nodes_table <- dbFetch(query2)
+nodes_table$node_size <- as.numeric(nodes_table$pubs)
+
+network_table$edge_size <- as.numeric((network_table$weight)/100)
+
+network_graph <- ggnet2(network_table,
+  mode = "fruchtermanreingold",
+  layout.par = list(max.delta = 1),
+  layout.exp = 0.3,
+  label = TRUE,
+  label.trim=100,
+  label.color = "black",
+  label.alpha = 1,
+  label.size = 3.5,
+  node.shape = 19,
+  node.alpha = 0.7,
+  node.color = "maroon",
+  node.size = 5.0,
+  edge.lty= 19, #'solid'
+  edge.color = "navy",
+  edge.alpha = 0.3,
+  edge.size = "edge_size",
+  vjust = 1.5,
+  hjust= 0.6,
+  legend.size = 9,
+  legend.position = "right"
+)
+```
+
+<img src="./network-images/network_graph.svg">
+  <figcaption>Network graph using GGaly ggnet2.</figcaption>
+
+  
 
