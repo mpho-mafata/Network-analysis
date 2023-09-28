@@ -1,4 +1,4 @@
-# network analysis
+# Network analysis
 Here we look at how to construct data sets for network analysis using SQL queries and graphs them using R and python.
 I always find that the data structuring is the hardest part of any data analysis.
 Examples are given from bibliometric data.
@@ -6,7 +6,7 @@ Examples are given from bibliometric data.
 ## SQL query
 In order to construct a network we need to create a list of nodes (central points of intersection) and edges (lines  connecting each point).
 
-### create an edgelist
+### Create an edgelist
 ```
 CREATE MATERIALIZED VIEW edgelist_orgs AS
 SELECT DISTINCT edgelist.ut, edgelist.from, edgelist.to
@@ -46,11 +46,11 @@ WOS:000173507400007|Nagoya University|National Institutes of Natural Sciences (N
 ${\color{red}WOS:000173507400007}$|${\color{red}National \space Astronomical \space Observatory \space of \space Japan}$|${\color{red}Nagoya \space University}$|
 WOS:000173507400007|National Astronomical Observatory of Japan|National Institutes of Natural Sciences (NINS) - Japan|
 
-## remove duplicate relationships
+## Remove duplicate relationships
 We will notice that the edgelist will contain similar pairs highlighted above. Note that these are in the same document (same ut number). 
 In the case that the data has directionality, these are kept as is in the order they are observed (to and from).
 In the case that there are no directional implications, these are duplicate pairs and must be removed.
-We start by creating an (alphabetically)ordered list and turn it into an array of pairs.
+We start by creating an (alphabetically) ordered list and turn it into an array of pairs.
 
 ```
 CREATE MATERIALIZED VIEW alphabetical_edgelist_orgs AS
@@ -87,7 +87,7 @@ WOS:000179648100005|Nagoya University->National Institutes of Natural Sciences (
 WOS:000179648100005|Nagoya University->University of Tokyo|
 WOS:000179648100005|National Astronomical Observatory of Japan->National Institutes of Natural Sciences (NINS) - Japan|
 
-## create final edgelist of organizations for network analysis
+## Create final edgelist of organizations for network analysis
 Now that we have the pairs, we can group by them in order to remove any duplicate relationship per pair.
 Now with uniques pairs per documnet, we can count the number of documents each pair shares (this will become the edge weight).
 ```
@@ -132,7 +132,7 @@ Max Planck Society|National Aeronautics & Space Administration (NASA)|74|
 ```
 library(RPostgres) # To interact with postgresql
 library(readxl)
-library(GGally) #ggnet2 is available through the GGally package
+library(GGally) # ggnet2 is available through the GGally package
 
 # Script settings for postgresql
 my_credentials <- readxl::read_xlsx("C:/Users/folder/my_credentials.xlsx")
@@ -224,7 +224,7 @@ cursor.execute(f'SELECT * from {schema1}.{table1}')
 # Fetch required data
 network_table = cursor.fetchall();
 
-#Closing the connection
+# Closing the connection
 connec.close()
 
 # structure the data and plot the network
