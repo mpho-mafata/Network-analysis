@@ -194,5 +194,55 @@ network_graph <- ggnet2(network_table,
 <img src="./network-images/network_graph.svg">
   <figcaption>Network graph using GGaly ggnet2.</figcaption>
 
-  
+### Python plots using Networkx 
 
+```
+# get my postgresql credentials
+import pandas as pd
+credentials = pd.read_excel("C:/Users/folder/my_credentials.xlsx")
+port = 5432
+my_dbname = credentials.my_dbname[0]
+my_host = credentials.my_host[0]
+my_user = credentials.my_user[0]
+my_password = credentials.my_password[0]
+
+# connect to postgresql
+import psycopg # to connect to postgresql
+connec = psycopg.connect(
+    port=5432,
+    host=my_host,
+    dbname=my_dbname,
+    user=my_user,
+    password=my_password)
+
+#Retrieve data tables
+cursor = connec.cursor()
+table1 = 'edgelist_orgs_network'
+schema1 = 'my_schema'
+cursor.execute(f'SELECT * from {schema1}.{table1}')
+
+# Fetch required data
+network_table = cursor.fetchall();
+
+#Closing the connection
+connec.close()
+
+# structure the data and plot the network
+network_table = pd.DataFrame(network_table)
+network_table.columns = ["from","to","weight"]
+del network_table['weight']
+
+import matplotlib.pyplot as plt
+import networkx as nx
+
+plt.figure(figsize = (12,8))
+network_graph = nx.Graph()
+
+network_graph = nx.from_pandas_edgelist(network_table, "from","to")
+
+network_graph = nx.draw(network_graph, with_labels = True, font_size = 8, alpha=1.0, node_size = 20, node_color="maroon",edge_color= 'darkblue',  linewidths=6,arrows=True, connectionstyle="arc3, rad=0.0")
+
+plt.show()
+```
+<img src="./network-images/networkx_graph.svg">
+  <figcaption>Network graph using NetworkX.</figcaption>
