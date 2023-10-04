@@ -46,7 +46,7 @@ WOS:000173507400007|Nagoya University|National Institutes of Natural Sciences (N
 ${\color{red}WOS:000173507400007}$|${\color{red}National \space Astronomical \space Observatory \space of \space Japan}$|${\color{red}Nagoya \space University}$|
 WOS:000173507400007|National Astronomical Observatory of Japan|National Institutes of Natural Sciences (NINS) - Japan|
 
-## Remove duplicate relationships
+### Remove duplicate relationships
 We will notice that the edgelist will contain similar pairs highlighted above. Note that these are in the same document (same ut number). 
 In the case that the data has directionality, these are kept as is in the order they are observed (to and from).
 In the case that there are no directional implications, these are duplicate pairs and must be removed.
@@ -87,7 +87,7 @@ WOS:000179648100005|Nagoya University->National Institutes of Natural Sciences (
 WOS:000179648100005|Nagoya University->University of Tokyo|
 WOS:000179648100005|National Astronomical Observatory of Japan->National Institutes of Natural Sciences (NINS) - Japan|
 
-## Create final edgelist of organizations for network analysis
+### Create final edgelist of organizations for network analysis
 Now that we have the pairs, we can group by them in order to remove any duplicate relationship per pair.
 Now with uniques pairs per documnet, we can count the number of documents each pair shares (this will become the edge weight).
 ```
