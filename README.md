@@ -28,7 +28,9 @@ I have also provided the python script I used to generate and test the code [her
 >> [R plots using GGally](https://github.com/mpho-mafata/Network-analysis/tree/main#r-plots-using-ggally)
 >>
 >> [Python plots using Networkx](https://github.com/mpho-mafata/Network-analysis/tree/main#python-plots-using-networkx)
->>
+>
+> [Generating insight](https://github.com/mpho-mafata/Network-analysis/tree/main#generate-insight)
+>
 
 # Preparing the dataframe
 In order to construct a network we need to create a list of nodes (central points of intersection) and edges (lines  connecting each point).
@@ -329,3 +331,15 @@ plt.show()
 ```
 <img src="./network-images/networkx_graph.svg"> 
   <figcaption> Network graph using NetworkX.</figcaption>
+
+# Generating insight
+The data we have in the example above generated some insight into the relationships between network entities (nodes). 
+
+Insights such as
+ * the number of connections per entity
+ * The weight of each connection
+
+More isights can be drawn from network data if the data is available. For example, numeric or categorical data descriptors of the entities. In this example it could be geographical origin of the organization. This insights can be parsed on to the graph in different ways. 
+
+In this section I will work on describing the different kinds of insights that can be gained from a network graph and how to incorporate them.
+
