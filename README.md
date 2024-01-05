@@ -1,3 +1,5 @@
+<img src="./network-images/networks-graphical-rep.png">
+
 # Introduction
 Here we look at how to construct data sets for network analysis using SQL queries and graphs them using R and python.
 I always find that the data structuring is the hardest part of any data analysis.
