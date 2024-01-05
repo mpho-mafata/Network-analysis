@@ -312,21 +312,30 @@ network_table = cursor.fetchall();
 # Closing the connection
 connec.close()
 
-# structure the data and plot the network
+# structure the data
 network_table = pd.DataFrame(network_table)
 network_table.columns = ["from","to","weight"]
-del network_table['weight']
 
 import matplotlib.pyplot as plt
 import networkx as nx
 
-plt.figure(figsize = (12,8))
+# plot the graph
+plt.figure(figsize=(30, 15))
 network_graph = nx.Graph()
-
-network_graph = nx.from_pandas_edgelist(network_table, "from","to")
-
-network_graph = nx.draw(network_graph, with_labels = True, font_size = 8, alpha=1.0, node_size = 20, node_color="maroon",edge_color= 'darkblue',  linewidths=6,arrows=True, connectionstyle="arc3, rad=0.0")
-
+network_graph = nx.from_pandas_edgelist(dataset, source="org1", target="org2", edge_attr ='weight')
+widths = nx.get_edge_attributes(network_graph, name= 'weight')
+network_graph = nx.draw(network_graph, with_labels=True, font_size=25, alpha=1.0,
+                        node_size=800,
+                        node_color=range(len(node_sizes)), # generates random node colours
+                        cmap=plt.cm.viridis, # colour map for the nodes
+                        arrows=True,
+                        connectionstyle="arc3, rad=0.20",
+                        width=list(widths.values()),
+                        edge_color = 'grey'
+                        )
+plt.savefig(fname='networkx_graph.svg', dpi=800,
+            bbox_inches="tight", pad_inches=0.0,
+            transparent=True, format="svg")
 plt.show()
 ```
 <img src="./network-images/networkx_graph.svg"> 
