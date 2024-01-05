@@ -165,51 +165,42 @@ The [example data](https://github.com/mpho-mafata/Network-analysis/tree/main/net
 DROP MATERIALIZED VIEW IF EXISTS edgelist_orgs_network;
 CREATE MATERIALIZED VIEW edgelist_orgs_network AS
 WITH alphabetical_edgelist_orgs AS
-    (
-    WITH edgelist_orgs AS
-             (SELECT DISTINCT edgelist.ut, edgelist.from, edgelist.to
-              FROM (SELECT DISTINCT ARRAYS.ut AS ut,
-                                    COUNTED.organisation as from,
-                                    unnest(ARRAYS.orgs)  AS to
-                    FROM (SELECT DISTINCT ut, ARRAY_AGG(organisation) AS orgs
-                          FROM mpho.orgs_rankings_top
-                          GROUP BY ut
-                          ORDER BY ut) AS ARRAYS
-                             JOIN
-                         (SELECT ut, COUNT(ut), organisation
-                          FROM mpho.orgs_rankings_top
-                          GROUP BY ut, organisation
-                          ORDER BY organisation) AS COUNTED
-                         ON ARRAYS.ut = COUNTED.ut) AS edgelist
-              WHERE edgelist.from != edgelist.to
-              ORDER BY edgelist.ut, edgelist.from, edgelist.to)
-    SELECT DISTINCT TABLES.links, TABLES.ut
-    FROM
-        (
-        SELECT ut,
-            CASE WHEN
-            UPPER(edgelist_orgs."from")>UPPER(edgelist_orgs."to")
-            THEN edgelist_orgs."to"||'->'||edgelist_orgs."from"
-            ELSE
-            edgelist_orgs."from"||'->'||edgelist_orgs."to"
-            END AS links
-        FROM edgelist_orgs
-            ) as TABLES
-    ORDER BY tables.links, tables.ut)
-SELECT nodes[1] as "from", nodes[2]  as "to", ar.weight
-FROM (
-    SELECT
-        m.weight,
-        STRING_TO_ARRAY(m.links, '->') nodes
-    FROM (
-        SELECT
-            COUNT(DISTINCT a.ut) weight,
-            a.links
-        FROM alphabetical_edgelist_orgs AS a
-        GROUP BY a.links
-        ORDER BY COUNT(DISTINCT a.UT) DESC
-    ) m
-) ar
+         (WITH edgelist_orgs AS
+                   (SELECT DISTINCT edgelist.ut, edgelist.from, edgelist.to
+                    FROM (SELECT DISTINCT ARRAYS.ut            AS ut,
+                                          COUNTED.organisation as from,
+                                          unnest(ARRAYS.orgs)  AS to
+                          FROM (SELECT DISTINCT ut, ARRAY_AGG(organisation) AS orgs
+                                FROM mpho.orgs_rankings_top
+                                GROUP BY ut
+                                ORDER BY ut) AS ARRAYS
+                                   JOIN
+                               (SELECT ut, COUNT(ut), organisation
+                                FROM mpho.orgs_rankings_top
+                                GROUP BY ut, organisation
+                                ORDER BY organisation) AS COUNTED
+                               ON ARRAYS.ut = COUNTED.ut) AS edgelist
+                    WHERE edgelist.from != edgelist.to
+                    ORDER BY edgelist.ut, edgelist.from, edgelist.to)
+          SELECT DISTINCT TABLES.links, TABLES.ut
+          FROM (SELECT ut,
+                       CASE
+                           WHEN
+                               UPPER(edgelist_orgs."from") > UPPER(edgelist_orgs."to")
+                               THEN edgelist_orgs."to" || '->' || edgelist_orgs."from"
+                           ELSE
+                               edgelist_orgs."from" || '->' || edgelist_orgs."to"
+                           END AS links
+                FROM edgelist_orgs) as TABLES
+          ORDER BY tables.links, tables.ut)
+SELECT nodes[1] as "from", nodes[2] as "to", ar.weight
+FROM (SELECT m.weight,
+             STRING_TO_ARRAY(m.links, '->') nodes
+      FROM (SELECT COUNT(DISTINCT a.ut) weight,
+                   a.links
+            FROM alphabetical_edgelist_orgs AS a
+            GROUP BY a.links
+            ORDER BY COUNT(DISTINCT a.UT) DESC) m) ar
 ;
 ```
 
