@@ -327,5 +327,5 @@ network_graph = nx.draw(network_graph, with_labels = True, font_size = 8, alpha=
 
 plt.show()
 ```
-<img src="./network-images/networkx_graph.svg">
-  <figcaption>Network graph using NetworkX.</figcaption>
+<img src="./network-images/networkx_graph.svg"> 
+  <figcaption> Network graph using NetworkX.</figcaption>
