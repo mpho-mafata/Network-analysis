@@ -1,13 +1,15 @@
 <img src="./network-images/networks-graphical-rep.png">
 
 # Introduction
-Here we look at how to construct data sets for network analysis using SQL queries and graphs them using R and python.
-I always find that the data structuring is the hardest part of any data analysis.
-Examples are given from bibliometric data.
+Here we look at how to construct data sets for network analysis using SQL, Python, and R.
+I always find that the data wrangling is the hardest part of any data analysis so I added this part mainly because the data wrangling part of most analysis is often omitted making it an obstacle for any given analysis.
+I have used some example data from bibliometrics but the principles are widely applicable. The example data is provided in the [repository](https://github.com/mpho-mafata/Network-analysis/tree/main/network-example-data).
 
-## Table of contents
+# Table of contents
 > [Introduction](https://github.com/mpho-mafata/Network-analysis/tree/main#introduction)
 >
+> [Table of contents](https://github.com/mpho-mafata/Network-analysis/tree/main#table-of-contents)
+> 
 > [Preparing the data frame](https://github.com/mpho-mafata/Network-analysis/tree/main#preparing-the-data-frame)
 > 
 >> [Query using postgreSQL](https://github.com/mpho-mafata/Network-analysis/tree/main#query-using-postgresql)
@@ -16,6 +18,10 @@ Examples are given from bibliometric data.
 >>>
 >>> [Remove duplicate relationships](https://github.com/mpho-mafata/Network-analysis/tree/main#remove-duplicate-relationships)
 >>>
+>> [Data wrangling using Python](https://github.com/mpho-mafata/Network-analysis/tree/main#data-wrangling-using-python)
+>>
+>> [Data wrangling using R](https://github.com/mpho-mafata/Network-analysis/tree/main#data-wrangling-using-r)
+>> 
 > [Visualize the network](https://github.com/mpho-mafata/Network-analysis/tree/main#visualize-the-network)
 >
 >> [R plots using GGally](https://github.com/mpho-mafata/Network-analysis/tree/main#r-plots-using-ggally)
@@ -24,9 +30,11 @@ Examples are given from bibliometric data.
 >>
 
 # Preparing the dataframe
+In order to construct a network we need to create a list of nodes (central points of intersection) and edges (lines  connecting each point).
+The wrangling can thus be done in different ways depending on the data source. SQL wrangling is dependednt on whether you source the data from postgreSQL, the python pandas and R tidyverse wrangling is a workable solution for local files.
 
 ## Query using postgreSQL
-In order to construct a network we need to create a list of nodes (central points of intersection) and edges (lines  connecting each point).
+This section is not very efficient but it works. It generates multiple MVs which is not very efficient. I will try to work on optimizing the query so that we have only one MV or table at the end of the query. This can be done using buckets or temporary tables. We will find out soon I guese.
 
 ### Create an edgelist
 ```
@@ -148,8 +156,10 @@ Max Planck Society|Ohio State University|76|
 Max Planck Society|Smithsonian Institution|76|
 Max Planck Society|National Aeronautics & Space Administration (NASA)|74|
 
-# Data wrangling using Python 
+## Data wrangling using Python 
 
+
+## Data wrangling using R
 
 ## Visualize the network
 
