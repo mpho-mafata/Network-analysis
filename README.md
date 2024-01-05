@@ -1,11 +1,16 @@
-# Introduction
-Here we look at how to construct data sets for network analysis using SQL queries and graphs them using R and python.
-I always find that the data structuring is the hardest part of any data analysis.
-Examples are given from bibliometric data.
+<img src="./network-images/networks-graphical-rep.png">
 
-## Table of contents
+# Introduction
+Here we look at how to construct data sets for network analysis using SQL, Python, and R.
+I always find that the data wrangling is the hardest part of any data analysis so I added this part mainly because the data wrangling part of most analysis is often omitted making it an obstacle for any given analysis.
+I have used some example data from bibliometrics but the principles are widely applicable. The example data is provided in the [repository](https://github.com/mpho-mafata/Network-analysis/tree/main/network-example-data).
+I have also provided the python script I used to generate and test the code [here](https://github.com/mpho-mafata/Network-analysis/blob/main/network_analysis.py).
+
+# Table of contents
 > [Introduction](https://github.com/mpho-mafata/Network-analysis/tree/main#introduction)
 >
+> [Table of contents](https://github.com/mpho-mafata/Network-analysis/tree/main#table-of-contents)
+> 
 > [Preparing the data frame](https://github.com/mpho-mafata/Network-analysis/tree/main#preparing-the-data-frame)
 > 
 >> [Query using postgreSQL](https://github.com/mpho-mafata/Network-analysis/tree/main#query-using-postgresql)
@@ -14,6 +19,10 @@ Examples are given from bibliometric data.
 >>>
 >>> [Remove duplicate relationships](https://github.com/mpho-mafata/Network-analysis/tree/main#remove-duplicate-relationships)
 >>>
+>> [Data wrangling using Python](https://github.com/mpho-mafata/Network-analysis/tree/main#data-wrangling-using-python)
+>>
+>> [Data wrangling using R](https://github.com/mpho-mafata/Network-analysis/tree/main#data-wrangling-using-r)
+>> 
 > [Visualize the network](https://github.com/mpho-mafata/Network-analysis/tree/main#visualize-the-network)
 >
 >> [R plots using GGally](https://github.com/mpho-mafata/Network-analysis/tree/main#r-plots-using-ggally)
@@ -22,9 +31,11 @@ Examples are given from bibliometric data.
 >>
 
 # Preparing the dataframe
+In order to construct a network we need to create a list of nodes (central points of intersection) and edges (lines  connecting each point).
+The wrangling can thus be done in different ways depending on the data source. SQL wrangling is dependednt on whether you source the data from postgreSQL, the python pandas and R tidyverse wrangling is a workable solution for local files.
 
 ## Query using postgreSQL
-In order to construct a network we need to create a list of nodes (central points of intersection) and edges (lines  connecting each point).
+
 
 ### Create an edgelist
 ```
@@ -146,8 +157,57 @@ Max Planck Society|Ohio State University|76|
 Max Planck Society|Smithsonian Institution|76|
 Max Planck Society|National Aeronautics & Space Administration (NASA)|74|
 
-# Data wrangling using Python 
+### Optimized SQL query
+The previous sections outlined important data wrangling parts to generating the dataframe needed for the network analysis. However, seperately these are not very efficient but they work. The code generates multiple MVs which is not a very efficient strategy. In optimizing the query, I used nested WITH statements, the aliases of which are the same as the MVs previously generated so the code can remain the same, for the most part.
+The [example data](https://github.com/mpho-mafata/Network-analysis/tree/main/network-example-data) provided can be imported as a table to a schema referenced below. My schema name in this example is __*mpho*__.
 
+```
+DROP MATERIALIZED VIEW IF EXISTS edgelist_orgs_network;
+CREATE MATERIALIZED VIEW edgelist_orgs_network AS
+WITH alphabetical_edgelist_orgs AS
+         (WITH edgelist_orgs AS
+                   (SELECT DISTINCT edgelist.ut, edgelist.from, edgelist.to
+                    FROM (SELECT DISTINCT ARRAYS.ut            AS ut,
+                                          COUNTED.organisation as from,
+                                          unnest(ARRAYS.orgs)  AS to
+                          FROM (SELECT DISTINCT ut, ARRAY_AGG(organisation) AS orgs
+                                FROM mpho.orgs_rankings_top
+                                GROUP BY ut
+                                ORDER BY ut) AS ARRAYS
+                                   JOIN
+                               (SELECT ut, COUNT(ut), organisation
+                                FROM mpho.orgs_rankings_top
+                                GROUP BY ut, organisation
+                                ORDER BY organisation) AS COUNTED
+                               ON ARRAYS.ut = COUNTED.ut) AS edgelist
+                    WHERE edgelist.from != edgelist.to
+                    ORDER BY edgelist.ut, edgelist.from, edgelist.to)
+          SELECT DISTINCT TABLES.links, TABLES.ut
+          FROM (SELECT ut,
+                       CASE
+                           WHEN
+                               UPPER(edgelist_orgs."from") > UPPER(edgelist_orgs."to")
+                               THEN edgelist_orgs."to" || '->' || edgelist_orgs."from"
+                           ELSE
+                               edgelist_orgs."from" || '->' || edgelist_orgs."to"
+                           END AS links
+                FROM edgelist_orgs) as TABLES
+          ORDER BY tables.links, tables.ut)
+SELECT nodes[1] as "from", nodes[2] as "to", ar.weight
+FROM (SELECT m.weight,
+             STRING_TO_ARRAY(m.links, '->') nodes
+      FROM (SELECT COUNT(DISTINCT a.ut) weight,
+                   a.links
+            FROM alphabetical_edgelist_orgs AS a
+            GROUP BY a.links
+            ORDER BY COUNT(DISTINCT a.UT) DESC) m) ar
+;
+```
+
+## Data wrangling using Python 
+
+
+## Data wrangling using R
 
 ## Visualize the network
 
