@@ -4,6 +4,7 @@
 Here we look at how to construct data sets for network analysis using SQL, Python, and R.
 I always find that the data wrangling is the hardest part of any data analysis so I added this part mainly because the data wrangling part of most analysis is often omitted making it an obstacle for any given analysis.
 I have used some example data from bibliometrics but the principles are widely applicable. The example data is provided in the [repository](https://github.com/mpho-mafata/Network-analysis/tree/main/network-example-data).
+I have also provided the python script I used to generate and test the code [here](https://github.com/mpho-mafata/Network-analysis/blob/main/network_analysis.py).
 
 # Table of contents
 > [Introduction](https://github.com/mpho-mafata/Network-analysis/tree/main#introduction)
