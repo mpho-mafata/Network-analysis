@@ -1,22 +1,29 @@
-# Network analysis
+# Introduction
 Here we look at how to construct data sets for network analysis using SQL queries and graphs them using R and python.
 I always find that the data structuring is the hardest part of any data analysis.
 Examples are given from bibliometric data.
 
 ## Table of contents
-> [SQL query](https://github.com/mpho-mafata/Network-analysis/tree/main#sql-query)
+> [Introduction](https://github.com/mpho-mafata/Network-analysis/tree/main#introduction)
 >
->> [Create an edgelist](https://github.com/mpho-mafata/Network-analysis/tree/main#Create-an-edgelist)
+> [Preparing the data frame](https://github.com/mpho-mafata/Network-analysis/tree/main#preparing-the-data-frame)
+> 
+>> [Query using postgreSQL](https://github.com/mpho-mafata/Network-analysis/tree/main#query-using-postgresql)
 >>
->> [Remove duplicate relationships](https://github.com/mpho-mafata/Network-analysis/tree/main#remove-duplicate-relationships)
->>
+>>> [Create an edgelist](https://github.com/mpho-mafata/Network-analysis/tree/main#Create-an-edgelist)
+>>>
+>>> [Remove duplicate relationships](https://github.com/mpho-mafata/Network-analysis/tree/main#remove-duplicate-relationships)
+>>>
 > [Visualize the network](https://github.com/mpho-mafata/Network-analysis/tree/main#visualize-the-network)
 >
 >> [R plots using GGally](https://github.com/mpho-mafata/Network-analysis/tree/main#r-plots-using-ggally)
 >>
 >> [Python plots using Networkx](https://github.com/mpho-mafata/Network-analysis/tree/main#python-plots-using-networkx)
 >>
-## SQL query
+
+# Preparing the dataframe
+
+## Query using postgreSQL
 In order to construct a network we need to create a list of nodes (central points of intersection) and edges (lines  connecting each point).
 
 ### Create an edgelist
@@ -138,6 +145,9 @@ National Astronomical Observatory of Japan|University of Tokyo|77|
 Max Planck Society|Ohio State University|76|
 Max Planck Society|Smithsonian Institution|76|
 Max Planck Society|National Aeronautics & Space Administration (NASA)|74|
+
+# Data wrangling using Python 
+
 
 ## Visualize the network
 
