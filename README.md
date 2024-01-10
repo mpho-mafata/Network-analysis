@@ -208,6 +208,27 @@ FROM (SELECT m.weight,
 
 ## Data wrangling using Python 
 
+```
+# get the original dataset
+dataset2 = pd.read_csv("/Users/mphomafata/Documents/GitHub/Network-analysis/network-example-data/orgs_rankings_top.csv",
+                       sep=";",
+                       header=0)
+nodes = dataset2.groupby(["organisation"]).aggregate({'pubs': 'first'}).reset_index()
+edges = dataset2[["ut", "organisation"]]
+# join the dataframe with itself based on the unique identifier (UT)
+edges = pd.merge(left=edges, right=edges, how="left", on='ut')
+# then remove the duplicates where org x is the same as org y
+edges = edges.query(" organisation_x != organisation_y ").reset_index(drop=True, inplace=False)
+# now remove the duplicates where org x: orgy is the same as org y: org x
+# first create an array of organization_x and organization_y and add it to the dataframe
+edges["org_array"] = edges["organisation_x"] + "," + edges["organisation_y"]
+edges["sorted"] = edges["org_array"].str.split(',').explode().str.split(',').apply(lambda x: [s.lstrip() for s in x]) \
+    .sort_values().groupby(level=0).agg(lambda x: ' , '.join(map(str, x)))
+# now count the unique number of UTs
+edges = edges.groupby(["organisation_x", "organisation_y", "sorted"]).aggregate({'ut': 'count'}).reset_index()
+edges['ut'] = ((edges['ut']) / max(edges['ut'])) * 10  # attempt at scaling the edge sizes from zero to one
+
+```
 
 ## Data wrangling using R
 
@@ -281,6 +302,8 @@ network_graph <- ggnet2(network_table,
 
 ### Python plots using Networkx 
 
+When reading the file from postgreSQL and structuring from there.
+
 ```
 # get my postgresql credentials
 import pandas as pd
@@ -316,22 +339,26 @@ connec.close()
 network_table = pd.DataFrame(network_table)
 network_table.columns = ["from","to","weight"]
 
+```
+
+The data can then be plotted similarly both the SQL and python wrangling
+```
 import matplotlib.pyplot as plt
 import networkx as nx
 
 # plot the graph
 plt.figure(figsize=(30, 15))
 network_graph = nx.Graph()
-network_graph = nx.from_pandas_edgelist(dataset, source="org1", target="org2", edge_attr ='weight')
-widths = nx.get_edge_attributes(network_graph, name= 'weight')
+network_graph = nx.from_pandas_edgelist(edges, source="organisation_x", target="organisation_y", edge_attr='ut')
+widths = nx.get_edge_attributes(network_graph, name='ut')
 network_graph = nx.draw(network_graph, with_labels=True, font_size=25, alpha=1.0,
                         node_size=800,
-                        node_color=range(len(node_sizes)), # generates random node colours
-                        cmap=plt.cm.viridis, # colour map for the nodes
+                        node_color=range(len(nodes)),  # generates random node colours
+                        cmap=plt.cm.viridis,  # colour map for the nodes
                         arrows=True,
                         connectionstyle="arc3, rad=0.20",
                         width=list(widths.values()),
-                        edge_color = 'grey'
+                        edge_color='grey'
                         )
 plt.savefig(fname='networkx_graph.svg', dpi=800,
             bbox_inches="tight", pad_inches=0.0,
