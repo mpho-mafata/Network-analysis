@@ -28,7 +28,9 @@ I have also provided the python script I used to generate and test the code [her
 >> [R plots using GGally](https://github.com/mpho-mafata/Network-analysis/tree/main#r-plots-using-ggally)
 >>
 >> [Python plots using Networkx](https://github.com/mpho-mafata/Network-analysis/tree/main#python-plots-using-networkx)
->>
+>
+> [Generating insight](https://github.com/mpho-mafata/Network-analysis/tree/main#generate-insight)
+>
 
 # Preparing the dataframe
 In order to construct a network we need to create a list of nodes (central points of intersection) and edges (lines  connecting each point).
@@ -310,22 +312,43 @@ network_table = cursor.fetchall();
 # Closing the connection
 connec.close()
 
-# structure the data and plot the network
+# structure the data
 network_table = pd.DataFrame(network_table)
 network_table.columns = ["from","to","weight"]
-del network_table['weight']
 
 import matplotlib.pyplot as plt
 import networkx as nx
 
-plt.figure(figsize = (12,8))
+# plot the graph
+plt.figure(figsize=(30, 15))
 network_graph = nx.Graph()
-
-network_graph = nx.from_pandas_edgelist(network_table, "from","to")
-
-network_graph = nx.draw(network_graph, with_labels = True, font_size = 8, alpha=1.0, node_size = 20, node_color="maroon",edge_color= 'darkblue',  linewidths=6,arrows=True, connectionstyle="arc3, rad=0.0")
-
+network_graph = nx.from_pandas_edgelist(dataset, source="org1", target="org2", edge_attr ='weight')
+widths = nx.get_edge_attributes(network_graph, name= 'weight')
+network_graph = nx.draw(network_graph, with_labels=True, font_size=25, alpha=1.0,
+                        node_size=800,
+                        node_color=range(len(node_sizes)), # generates random node colours
+                        cmap=plt.cm.viridis, # colour map for the nodes
+                        arrows=True,
+                        connectionstyle="arc3, rad=0.20",
+                        width=list(widths.values()),
+                        edge_color = 'grey'
+                        )
+plt.savefig(fname='networkx_graph.svg', dpi=800,
+            bbox_inches="tight", pad_inches=0.0,
+            transparent=True, format="svg")
 plt.show()
 ```
-<img src="./network-images/networkx_graph.svg">
-  <figcaption>Network graph using NetworkX.</figcaption>
+<img src="./network-images/networkx_graph.svg"> 
+  <figcaption> Network graph using NetworkX.</figcaption>
+
+# Generating insight
+The data we have in the example above generated some insight into the relationships between network entities (nodes). 
+
+Insights such as
+ * the number of connections per entity
+ * The weight of each connection
+
+More isights can be drawn from network data if the data is available. For example, numeric or categorical data descriptors of the entities. In this example it could be geographical origin of the organization. This insights can be parsed on to the graph in different ways. 
+
+In this section I will work on describing the different kinds of insights that can be gained from a network graph and how to incorporate them.
+
