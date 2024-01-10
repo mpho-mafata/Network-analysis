@@ -10,7 +10,6 @@ dataset = pd.read_excel(
 dataset.columns = ["org1", "org2", "weight"]
 dataset['weight'] = ((dataset['weight']) / max(
     dataset['weight'])) * 10  # attempt at scaling the edge sizes from zero to one
-dataset.to_excel("old_df.xlsx")
 # this creates node sizes
 node_sizes_1 = dataset.groupby(['org1']).aggregate({'org1': 'count'})
 node_sizes_2 = dataset.groupby(['org2']).aggregate({'org2': 'count'})
@@ -55,7 +54,6 @@ edges["sorted"] = edges["org_array"].str.split(',').explode().str.split(',').app
 edges = edges.groupby(["organisation_x", "organisation_y", "sorted"]).aggregate({'ut': 'count'}).reset_index()
 edges['ut'] = ((edges['ut']) / max(edges['ut'])) * 10  # attempt at scaling the edge sizes from zero to one
 
-edges.to_excel("new_df.xlsx")
 # plot the graph
 plt.figure(figsize=(30, 15))
 network_graph = nx.Graph()
@@ -73,4 +71,3 @@ network_graph = nx.draw(network_graph, with_labels=True, font_size=25, alpha=1.0
 plt.savefig(fname='networkx_graph_2.svg', dpi=800,
             bbox_inches="tight", pad_inches=0.0,
             transparent=True, format="svg")
-plt.show()
