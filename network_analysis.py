@@ -48,8 +48,8 @@ edges = edges.query(" organisation_x != organisation_y ").reset_index(drop=True,
 # now remove the duplicates where org x: orgy is the same as org y: org x
 # first create an array of organization_x and organization_y and add it to the dataframe
 edges["org_array"] = edges["organisation_x"] + "," + edges["organisation_y"]
-edges["sorted"] = edges["org_array"].str.split(',').explode().str.split(',').apply(lambda x: [s.lstrip() for s in x]) \
-    .sort_values().groupby(level=0).agg(lambda x: ' , '.join(map(str, x)))
+edges["sorted"] = edges["org_array"].str.split(',').explode().str.split(',').apply(
+    lambda x: [s.lstrip() for s in x]).sort_values().groupby(level=0).agg(lambda x: ' , '.join(map(str, x)))
 # now count the unique number of UTs
 edges = edges.groupby(["organisation_x", "organisation_y", "sorted"]).aggregate({'ut': 'count'}).reset_index()
 edges['ut'] = ((edges['ut']) / max(edges['ut'])) * 10  # attempt at scaling the edge sizes from zero to one
