@@ -378,4 +378,5 @@ Insights such as
 More isights can be drawn from network data if the data is available. For example, numeric or categorical data descriptors of the entities. In this example it could be geographical origin of the organization. This insights can be parsed on to the graph in different ways. 
 
 In this section I will work on describing the different kinds of insights that can be gained from a network graph and how to incorporate them.
+Examples for this are available for sensory network data [here](https://github.com/mpho-mafata/Network-analysis-of-sensory-attributes)
 
